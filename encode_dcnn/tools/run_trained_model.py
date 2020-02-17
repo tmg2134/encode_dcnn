@@ -13,15 +13,18 @@ from sklearn.metrics import confusion_matrix,precision_recall_curve, matthews_co
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--model', 
-  default='/cephfs/users/tgoodman/snnpet_cnn/encode_cnn_fullmodel.h5')
-parser.add_argument('--weights', 
-  default='/cephfs/users/tgoodman/snppet_cnn/encode_cnn_modelweights.h5')
-parser.add_argument('--data', 
-  default='/cephfs/users/tgoodman/snppet_cnn/dataset.hdf5')
-parser.add_argument('--tset', default=False, action='store_true', 
-  help="Use entire set in evaluation")
-parser.add_argument('--out', '-o', 
+parser.add_argument('--model')
+parser.add_argument('--weights')
+parser.add_argument('--data')
+parser.add_argument(
+  '--tset',
+  default=False,
+  action='store_true', 
+  help="Use entire set in evaluation"
+)
+parser.add_argument(
+  '--out',
+  '-o', 
   help="name and output a file of regions predicted as enhancers\n"+
        "\tBut only if they were marked as positive"
 )
