@@ -1,14 +1,16 @@
 import argparse, h5py, sys, os, json
 import numpy as np
 from keras.models import Sequential, load_model
-from keras.layers import Dense, Dropout, BatchNormalization, Activation, Convolution1D, Flatten
+from keras.layers import Dense, Dropout, BatchNormalization
+from keras.layers import Activation, Convolution1D, Flatten
 from keras.callbacks import EarlyStopping
 from keras.utils import to_categorical
 # load and evaluate a saved model
 from numpy import loadtxt
 from sklearn.model_selection import cross_validate
 from sklearn import datasets, svm
-from sklearn.metrics import confusion_matrix,precision_recall_curve, matthews_corrcoef,auc,roc_curve, classification_report 
+from sklearn.metrics import confusion_matrix,precision_recall_curve, 
+from sklearn.metrics import matthews_corrcoef,auc,roc_curve, classification_report
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 

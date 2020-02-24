@@ -4,7 +4,8 @@ import argparse
 import h5py
 import numpy as np
 from keras.models import Sequential, Model
-from keras.layers import Dense, Dropout, BatchNormalization, Activation, Convolution1D, Flatten
+from keras.layers import Dense, Dropout, BatchNormalization
+from keras.layers import Activation, Convolution1D, Flatten
 from keras.callbacks import EarlyStopping, ReduceLROnPlateau, ModelCheckpoint
 from keras.utils import to_categorical
 from keras.optimizers import Adam, Adadelta
@@ -55,8 +56,12 @@ for i in range(default_layers+additional_layers):
     filters=120,
     kernel_size=filter_size,
     activation=activation_func,
-    kernel_initializer=kernel_init))
-  snppet_net.add(BatchNormalization(name='batchnormalization_{}'.format(i+11), epsilon=1e-3))
+    kernel_initializer=kernel_init
+  ))
+  snppet_net.add(BatchNormalization(
+    name='batchnormalization_{}'.format(i+11),
+    epsilon=1e-3
+  ))
   snppet_net.add(Dropout(name='dropout_{}'.format(i+11), rate=0.1))
 
 # Final
@@ -64,9 +69,21 @@ snppet_net.add(Flatten(name='flatten_4'))
 snppet_net.add(Dense(name='dense_4', units=2, activation='softmax'))
 
 # Compile with ADAM optimizer, mean squared error loss function
-snppet_net.compile(loss=loss_function, optimizer=Adam(lr=.00015), metrics=['accuracy'])
-# learning_rate_reduction = ReduceLROnPlateau(monitor='val_acc', patience=3, verbose=1, 
-#                                             factor=0.5, min_lr=0.00001)
+snppet_net.compile(
+  loss=loss_function,
+  optimizer=Adam(lr=.00015),
+  metrics=['accuracy']
+)
+
+'''
+learning_rate_reduction = ReduceLROnPlateau(
+  monitor='val_acc',
+  patience=3,
+  verbose=1, 
+  factor=0.5,
+  min_lr=0.00001
+)
+'''
 
 enhancer_data = h5py.File(args['data'])
 X_train = np.array(enhancer_data['X_train'])
@@ -77,12 +94,24 @@ X_test = np.array(enhancer_data['X_test'])
 y_test = np.array(enhancer_data['y_test'])
 
 filepath = args['output_stub'] + '_fullmodel_best_val_loss.h5'
-checkpoint = ModelCheckpoint(filepath, monitor='val_loss', verbose=1, save_best_only=True, mode='min')
+checkpoint = ModelCheckpoint(filepath, 
+  monitor='val_loss',
+  verbose=1,
+  save_best_only=True,
+  mode='min'
+)
 callbacks_list = [checkpoint]
 
 # Run the model
-snppet_net.fit(X_train, y_train, validation_data=(X_valid, y_valid), epochs=args['epochs'], 
-               batch_size=args['batch_size'], callbacks=callbacks_list)
+snppet_net.fit(
+  X_train,
+  y_train,
+  validation_data=(X_valid, y_valid),
+  epochs=args['epochs'], 
+  batch_size=args['batch_size'],
+  callbacks=callbacks_list
+)
+
 metrics = snppet_net.evaluate(X_test, y_test, batch_size=128)
 print('Test metrics: {}'.format(metrics)) 
 

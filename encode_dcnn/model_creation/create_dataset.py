@@ -63,7 +63,11 @@ parser.add_argument(
     default=500,
     help='length of each sub-sequence. Default is 500',
 )
-parser.add_argument('--reference-fasta', help='Path to genome fasta', required=True)
+parser.add_argument(
+    '--reference-fasta',
+    help='Path to genome fasta',
+    required=True
+)
 parser.add_argument(
     '--genome-sizes',
     help='Genome sizes file (BED format)',
@@ -77,10 +81,13 @@ parser.add_argument(
 parser.add_argument(
     '--blacklist',
     default='blacklist/all_peaks_combined.bed',
-    help='bed file of regions to not include in selection of "non-enhancers"\n'+
-         'A good idea is to use a bed file of known enhancer regions',
+    help='bed file of regions to not include in selection of "non-enhancers"'+
+    '\nA good idea is to use a bed file of known enhancer regions',
 )
-parser.add_argument('--output', default='dataset.h5', help="Output name of dataset")
+parser.add_argument('--output', 
+    default='dataset.h5', 
+    help="Output name of dataset"
+)
 parser.add_argument(
     '--test-set',
     nargs='*',
@@ -152,16 +159,25 @@ for record in my_region_set['enhancer_peaks']:
     if chrom in test_set:
         X_t.extend(input_seqs)
         region_string = ':'.join([chrom, start, stop]) + '.{}'
-        y_t.extend([[1, 0, region_string.format(i)] for i in range(len(input_seqs))])
+        y_t.extend(
+            [[1, 0, region_string.format(i)] 
+            for i in range(len(input_seqs))]
+        )
     elif chrom in valid_set:
         X_v.extend(input_seqs)
         region_string = ':'.join([chrom, start, stop]) + '.{}'
-        y_v.extend([[1, 0, region_string.format(i)] for i in range(len(input_seqs))])
+        y_v.extend(
+            [[1, 0, region_string.format(i)] 
+            for i in range(len(input_seqs))]
+        )
     else:
         X.extend(input_seqs)
         # Format as "[region_string].[kmer_id]"
         region_string = ':'.join([chrom, start, stop]) + '.{}'
-        y.extend([[1, 0, region_string.format(i)] for i in range(len(input_seqs))])
+        y.extend(
+            [[1, 0, region_string.format(i)] 
+            for i in range(len(input_seqs))]
+        )
 
     # positive_seqs.append(next_input_seq)
 
@@ -179,7 +195,9 @@ while j < int(input_i * args['negative_input_ratio'] - 1):
     
     # can organize more clearly and create two seperate functions
     if notEnhancers == False:
-        rand_region = random.randint(0, len(my_region_set['complement_regions'])-1)
+        rand_region = random.randint(
+            0, len(my_region_set['complement_regions'])-1
+        )
         chrom, start, stop = my_region_set['complement_regions'][rand_region]
         if int(stop) - int(start) < args['expand_to']:
             del my_region_set['complement_regions'][rand_region]
