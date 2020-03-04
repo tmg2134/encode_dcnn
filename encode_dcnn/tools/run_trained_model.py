@@ -9,8 +9,8 @@ from keras.utils import to_categorical
 from numpy import loadtxt
 from sklearn.model_selection import cross_validate
 from sklearn import datasets, svm
-from sklearn.metrics import confusion_matrix,precision_recall_curve, 
-from sklearn.metrics import matthews_corrcoef,auc,roc_curve, classification_report
+from sklearn.metrics import confusion_matrix, precision_recall_curve
+from sklearn.metrics import matthews_corrcoef, classification_report
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 

@@ -9,7 +9,7 @@ import h5py
 from sklearn.model_selection import train_test_split
 from collections import defaultdict
 import json
-import encode_dcnn.tools.bedtools_operations as bto
+import bedtools_operations as bto
 
 # One hot encode sequence for CNN architecture
 OHE_SEQ = {
@@ -46,7 +46,7 @@ parser.add_argument(
     required=True, 
     help='Bed file of regions that are Enhancers for model to be trained on'
 )
-# parser.add_argument('--notEnhancers', default=False)
+parser.add_argument('--notEnhancers', default=False)
 parser.add_argument('--bedtools-path', default='bedtools')
 parser.add_argument(
     '--expand-to',
@@ -56,7 +56,7 @@ parser.add_argument(
          '\tAll regions need to be the same length if no window size given'
 )
 parser.add_argument('--input-feature-size', type=int, default=50)
-parser.add_argument('--window-size', type=int, default=5)
+parser.add_argument('--window-size', type=int, default=0)
 parser.add_argument(
     '--subseq-len',
     type=int,
@@ -107,14 +107,13 @@ EXPAND = int(args['expand_to'] / 2)
 test_set = [] 
 valid_set = []
 
-# I don't remember what this is for
-# if args['notEnhancers']:
-#     notEnhancers_regions_file = open(args['notEnhancers'])
-#     notEnhancers = []
-#     for i in notEnhancers_regions_file:
-#         notEnhancers.append(i.strip())
-# else:
-#     notEnhancers = False
+if args['notEnhancers']:
+    notEnhancers_regions_file = open(args['notEnhancers'])
+    notEnhancers = []
+    for i in notEnhancers_regions_file:
+        notEnhancers.append(i.strip())
+else:
+    notEnhancers = False
 
 # Set up storing generated data
 for i in args['test_set']:
@@ -145,8 +144,8 @@ print('Generating input sequences')
 X, y, input_i = list(), list(), 1
 for record in my_region_set['enhancer_peaks']:
     input_i += 1
-    if input_i % 9000 == 0:
-        print('Generated {} data points'.format(input_i))
+    # if input_i % 9000 == 0:
+    #     print('Generated {} data points'.format(input_i))
     chrom, start, stop = record.strip().split('\t')[:3]
     next_input_seq = ref.fetch(chrom, int(start), int(stop))
     input_seqs = extract_sequences(
@@ -194,7 +193,7 @@ while j < int(input_i * args['negative_input_ratio'] - 1):
         print('Generated {} complement data points'.format(j))
     
     # can organize more clearly and create two seperate functions
-    if notEnhancers == False:
+    if args['notEnhancers'] == False:
         rand_region = random.randint(
             0, len(my_region_set['complement_regions'])-1
         )
@@ -246,16 +245,12 @@ if len(test_set) > 0 and len(valid_set) > 0:
     X_train = np.array(X)
     y_train = np.array(y)
 elif len(test_set) > 0:
-    X_train, X_valid, y_train, y_valid = 
-        train_test_split(np.array(X), np.array(y), test_size=0.12)
+    X_train, X_valid, y_train, y_valid = train_test_split(np.array(X), np.array(y), test_size=0.12)
 elif len(valid_set) > 0:
-    X_train, X_test, y_train, y_test = 
-        train_test_split(np.array(X), np.array(y), test_size=0.12)
+    X_train, X_test, y_train, y_test = train_test_split(np.array(X), np.array(y), test_size=0.12)
 else:
-    X_train, X_interim, y_train, y_interim = 
-        train_test_split(np.array(X), np.array(y), test_size=0.2)
-    X_test, X_valid, y_test, y_valid = 
-        train_test_split(X_interim, y_interim, test_size=0.5)
+    X_train, X_interim, y_train, y_interim = train_test_split(np.array(X), np.array(y), test_size=0.2)
+    X_test, X_valid, y_test, y_valid = train_test_split(X_interim, y_interim, test_size=0.5)
 
 # Create region mapping
 y_with_regions = np.array(y)
